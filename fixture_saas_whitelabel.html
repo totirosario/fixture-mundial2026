@@ -556,6 +556,10 @@ async function apiGet(action, params={}){
       "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enR4bGNqbXZ6aGljc3FxcHZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzM4ODUsImV4cCI6MjA5MTc0OTg4NX0.WAO52MIN0VtXqxGBkCIVYl5KK6VCd_Yx2qRkpbuu7jA",
      },
   });
+  
+    return await res.json();
+  }catch(e){ return {status:"error", msg: e.message}; }
+}
 
 // ══════════════════════════════════════════════════════
 // INIT UI — Renderiza branding desde TENANT_CONFIG
