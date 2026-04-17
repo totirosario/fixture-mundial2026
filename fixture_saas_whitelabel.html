@@ -539,8 +539,7 @@ async function apiPost(action, data){
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enR4bGNqbXZ6aGljc3FxcHZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzM4ODUsImV4cCI6MjA5MTc0OTg4NX0.WAO52MIN0VtXqxGBkCIVYl5KK6VCd_Yx2qRkpbuu7jA
-",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enR4bGNqbXZ6aGljc3FxcHZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzM4ODUsImV4cCI6MjA5MTc0OTg4NX0.WAO52MIN0VtXqxGBkCIVYl5KK6VCd_Yx2qRkpbuu7jA",
       },
     return await res.json();
   }catch(e){ return {status:"error", msg: e.message}; }
@@ -551,11 +550,10 @@ async function apiGet(action, params={}){
   try{
     const qs = new URLSearchParams({action, slug: TENANT_CONFIG.slug, ...params});
     const res = await fetch(`${TENANT_CONFIG.api_url}?${qs}`, {
-      headers: {
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enR4bGNqbXZ6aGljc3FxcHZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzM4ODUsImV4cCI6MjA5MTc0OTg4NX0.WAO52MIN0VtXqxGBkCIVYl5KK6VCd_Yx2qRkpbuu7jA
-",
-      },
-    });
+    headers: {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enR4bGNqbXZ6aGljc3FxcHZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzM4ODUsImV4cCI6MjA5MTc0OTg4NX0.WAO52MIN0VtXqxGBkCIVYl5KK6VCd_Yx2qRkpbuu7jA",
+     },
+  });
 
 // ══════════════════════════════════════════════════════
 // INIT UI — Renderiza branding desde TENANT_CONFIG
