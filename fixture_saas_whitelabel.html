@@ -349,6 +349,7 @@ body{background:#fff;font-family:'Barlow Condensed',sans-serif;color:var(--text)
   <div id="footerLinks"></div>
   <div id="footerTagline" style="margin-top:6px;font-size:11px;"></div>
   <div style="margin-top:12px;"><button class="reset-btn" onclick="resetAll()">🗑 Reiniciar fixture</button></div>
+  <button class="reset-btn" onclick="cerrarSesion()" style="margin-left:8px;">🚪 Cerrar sesión</button>
 </div>
 </div><!-- /mainApp -->
 
@@ -1076,6 +1077,11 @@ function resetAll(){
   if(!confirm("¿Borrar todos tus pronósticos?"))return;
   initState();saveLocal();updateProgress();renderGrupos();renderThirdsPicker();renderEliminatoria();
   showToast("Fixture reiniciado ✓");
+}
+function cerrarSesion(){
+  if(!confirm("¿Cerrar sesión?"))return;
+  localStorage.removeItem(`${TENANT_CONFIG.slug}_user`);
+  location.reload();
 }
 function showLoading(msg){document.getElementById("loadingText").textContent=msg||"Cargando...";document.getElementById("loadingOverlay").classList.add("show");}
 function hideLoading(){document.getElementById("loadingOverlay").classList.remove("show");}
