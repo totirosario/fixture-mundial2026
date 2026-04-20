@@ -900,7 +900,7 @@ function checkCompletion(){
   if(koPicks["fn_0"]){
     completedNotified=true;
     saveLocal();
-    apiPost("completed",{email:currentUser.email, fecha:new Date().toLocaleString("es-AR")});
+    apiPost("completed",{email:currentUser.email, fecha:new Date().toISOString()});
     showToast("🏆 ¡Completaste el fixture! Estás en el sorteo");
     renderEliminatoria();
   }
@@ -923,7 +923,7 @@ async function submitReg(){
   if(!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)){show("errEmail");add("regEmail","error");ok=false;}else{hide("errEmail");rem("regEmail","error");}
   if(!ok)return;
   showLoading("Registrando...");
-  await apiPost("register",{nombre, email, fecha:new Date().toLocaleString("es-AR")});
+  await apiPost("register",{nombre, email, fecha:new Date().toISOString()});
   hideLoading();
   currentUser={nombre,email};
   localStorage.setItem(`${TENANT_CONFIG.slug}_user`,JSON.stringify(currentUser));
