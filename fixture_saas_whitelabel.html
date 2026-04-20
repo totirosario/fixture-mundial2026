@@ -435,7 +435,7 @@ const TENANT_CONFIG = {
   // Apunta a tu Edge Function de Supabase o servidor Next.js
   // Ejemplo: "https://tuproyecto.supabase.co/functions/v1/fixture-api"
   // Si es null: modo offline (solo localStorage, sin backend)
-  api_url: "https://eyztxlcjmvzhicsqqpvu.supabase.co/functions/v1/fixture-api",
+  api_url: "https://irjezmngnuwwmsnphoms.supabase.co/functions/v1/bright-responder",
 };
 
 // ══════════════════════════════════════════════════════
@@ -540,7 +540,7 @@ async function apiPost(action, data){
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enR4bGNqbXZ6aGljc3FxcHZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzM4ODUsImV4cCI6MjA5MTc0OTg4NX0.WAO52MIN0VtXqxGBkCIVYl5KK6VCd_Yx2qRkpbuu7jA",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlyamV6bW5nbnV3d21zbnBob21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2OTM2NjEsImV4cCI6MjA5MjI2OTY2MX0.FcYs7WR3g1PttbzHUCHOXBrkjSkBb7Sa459rq4L6JQE",
       },
       body: JSON.stringify({action, slug: TENANT_CONFIG.slug, ...data})
     });
@@ -554,7 +554,7 @@ async function apiGet(action, params={}){
     const qs = new URLSearchParams({action, slug: TENANT_CONFIG.slug, ...params});
     const res = await fetch(`${TENANT_CONFIG.api_url}?${qs}`, {
     headers: {
-      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enR4bGNqbXZ6aGljc3FxcHZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzM4ODUsImV4cCI6MjA5MTc0OTg4NX0.WAO52MIN0VtXqxGBkCIVYl5KK6VCd_Yx2qRkpbuu7jA",
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlyamV6bW5nbnV3d21zbnBob21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2OTM2NjEsImV4cCI6MjA5MjI2OTY2MX0.FcYs7WR3g1PttbzHUCHOXBrkjSkBb7Sa459rq4L6JQE",
      },
   });
   
