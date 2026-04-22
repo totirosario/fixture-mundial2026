@@ -369,20 +369,67 @@ body{background:#fff;font-family:'Barlow Condensed',sans-serif;color:var(--text)
   </div>
   <div id="adminContent" style="display:none;">
     <div class="admin-section">
-      <div class="admin-kpi" id="adminKpi"></div>
-      <div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;">
-        <button class="admin-btn orange" onclick="loadAdminData()">🔄 Actualizar</button>
-        <button class="admin-btn green" onclick="exportCSV()">⬇️ Exportar CSV</button>
-        <button class="admin-btn dark" onclick="doRaffle()">🎰 SORTEO</button>
-        <button class="admin-btn" style="background:#7a5c3a;color:#fff;" onclick="resetRaffle()">🔄 Resetear sorteo</button>
+      <!-- ADMIN TABS -->
+      <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border);">
+        <div id="atab-participantes" onclick="switchAdminTab('participantes')" style="padding:8px 16px;font-family:'Bebas Neue';font-size:14px;letter-spacing:1.5px;cursor:pointer;border-bottom:3px solid var(--orange);color:var(--orange);background:#fff;">👥 PARTICIPANTES</div>
+        <div id="atab-sorteo" onclick="switchAdminTab('sorteo')" style="padding:8px 16px;font-family:'Bebas Neue';font-size:14px;letter-spacing:1.5px;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted);">🎰 SORTEO</div>
       </div>
-      <div class="raffle-result" id="raffleResult"></div>
-      <div class="sec-title">PARTICIPANTES</div>
+
+      <!-- TAB PARTICIPANTES -->
+      <div id="asec-participantes">
+        <div class="admin-kpi" id="adminKpi"></div>
+        <div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;">
+          <button class="admin-btn orange" onclick="loadAdminData()">🔄 Actualizar</button>
+          <button class="admin-btn green" onclick="exportCSV()">⬇️ Exportar CSV</button>
+        </div>
+      </div>
+
+      <!-- TAB SORTEO -->
+      <div id="asec-sorteo" style="display:none;">
+        <div id="sorteo-idle" style="text-align:center;padding:32px 16px;">
+          <div style="font-size:64px;margin-bottom:12px;">🎰</div>
+          <div style="font-family:'Bebas Neue';font-size:28px;letter-spacing:3px;color:var(--dark);margin-bottom:6px;">SORTEO DE PREMIOS</div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.5;">Solo participan quienes completaron el fixture hasta la Final.</div>
+          <div id="sorteo-count" style="font-family:'Bebas Neue';font-size:18px;color:var(--orange);margin-bottom:24px;"></div>
+          <button onclick="startRaffle()" style="background:var(--orange);color:#fff;border:none;border-radius:10px;font-family:'Bebas Neue';font-size:24px;letter-spacing:3px;padding:16px 40px;cursor:pointer;box-shadow:0 4px 20px rgba(254,100,0,.4);">⚡ SORTEAR</button>
+        </div>
+        <div id="sorteo-spinning" style="display:none;text-align:center;padding:32px 16px;">
+          <div style="font-family:'Bebas Neue';font-size:16px;letter-spacing:3px;color:var(--muted);margin-bottom:20px;">SORTEANDO...</div>
+          <div style="background:var(--dark);border-radius:12px;padding:20px;margin-bottom:12px;">
+            <div style="font-family:'Bebas Neue';font-size:11px;letter-spacing:2px;color:rgba(255,255,255,.5);margin-bottom:8px;">🥇 1° PREMIO</div>
+            <div id="spin-name-1" style="font-family:'Bebas Neue';font-size:28px;color:var(--orange);letter-spacing:2px;min-height:36px;">—</div>
+          </div>
+          <div style="background:var(--dark);border-radius:12px;padding:20px;">
+            <div style="font-family:'Bebas Neue';font-size:11px;letter-spacing:2px;color:rgba(255,255,255,.5);margin-bottom:8px;">🥈 2° PREMIO</div>
+            <div id="spin-name-2" style="font-family:'Bebas Neue';font-size:28px;color:var(--orange);letter-spacing:2px;min-height:36px;">—</div>
+          </div>
+        </div>
+        <div id="sorteo-result" style="display:none;text-align:center;padding:24px 16px;">
+          <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9997;"></canvas>
+          <div style="font-size:48px;margin-bottom:8px;">🎉</div>
+          <div style="font-family:'Bebas Neue';font-size:26px;letter-spacing:3px;color:var(--orange);margin-bottom:20px;">¡TENEMOS GANADORES!</div>
+          <div id="result-winner-1" style="background:linear-gradient(135deg,#b8860b,var(--gold));border-radius:12px;padding:18px;margin-bottom:12px;">
+            <div style="font-family:'Bebas Neue';font-size:12px;letter-spacing:2px;color:rgba(255,255,255,.8);margin-bottom:4px;">🥇 1° PREMIO</div>
+            <div id="result-name-1" style="font-family:'Bebas Neue';font-size:28px;color:#fff;letter-spacing:1px;"></div>
+            <div id="result-email-1" style="font-size:12px;color:rgba(255,255,255,.7);margin-top:3px;"></div>
+          </div>
+          <div id="result-winner-2" style="background:linear-gradient(135deg,var(--orange),#ff8c00);border-radius:12px;padding:18px;margin-bottom:20px;">
+            <div style="font-family:'Bebas Neue';font-size:12px;letter-spacing:2px;color:rgba(255,255,255,.8);margin-bottom:4px;">🥈 2° PREMIO</div>
+            <div id="result-name-2" style="font-family:'Bebas Neue';font-size:28px;color:#fff;letter-spacing:1px;"></div>
+            <div id="result-email-2" style="font-size:12px;color:rgba(255,255,255,.7);margin-top:3px;"></div>
+          </div>
+          <button onclick="resetRaffle()" style="background:var(--dark);color:#fff;border:none;border-radius:8px;font-family:'Bebas Neue';font-size:16px;letter-spacing:2px;padding:10px 24px;cursor:pointer;">🔄 NUEVO SORTEO</button>
+        </div>
+      </div>
+
+      <div class="sec-title" id="admin-participantes-title">PARTICIPANTES</div>
+      <div id="admin-table-section">
       <div class="admin-table-wrap">
         <table class="admin-table" id="adminTable">
           <thead><tr><th>#</th><th>Nombre</th><th>Email</th><th>Registro</th><th>Completó</th></tr></thead>
           <tbody id="adminTableBody"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">Cargando...</td></tr></tbody>
         </table>
+      </div>
       </div>
     </div>
   </div>
@@ -1103,36 +1150,125 @@ function exportCSV(){
   a.click();showToast("CSV descargado ✓");
 }
 
-function resetRaffle(){
-  if(!confirm("¿Resetear el resultado del sorteo?"))return;
-  const res=document.getElementById("raffleResult");
-  res.style.display="none";
-  res.innerHTML="";
-  showToast("Sorteo reseteado ✓");
+function switchAdminTab(tab){
+  ["participantes","sorteo"].forEach(t=>{
+    document.getElementById("asec-"+t).style.display=t===tab?"block":"none";
+    const el=document.getElementById("atab-"+t);
+    el.style.borderBottomColor=t===tab?"var(--orange)":"transparent";
+    el.style.color=t===tab?"var(--orange)":"var(--muted)";
+    el.style.background=t===tab?"#fff":"transparent";
+  });
+  document.getElementById("admin-participantes-title").style.display=tab==="participantes"?"block":"none";
+  document.getElementById("admin-table-section").style.display=tab==="participantes"?"block":"none";
+  if(tab==="sorteo"){
+    const elegibles=adminData.filter(r=>r.completo);
+    document.getElementById("sorteo-count").textContent=`${elegibles.length} participante${elegibles.length!==1?"s":""} elegible${elegibles.length!==1?"s":""}`;
+  }
 }
 
-function doRaffle(){
+function resetRaffle(){
+  document.getElementById("sorteo-result").style.display="none";
+  document.getElementById("sorteo-spinning").style.display="none";
+  document.getElementById("sorteo-idle").style.display="block";
+  const canvas=document.getElementById("confetti-canvas");
+  if(canvas) canvas.getContext("2d").clearRect(0,0,canvas.width,canvas.height);
+}
+
+function startRaffle(){
   const elegibles=adminData.filter(r=>r.completo);
   if(!elegibles.length){showToast("No hay participantes que completaron aún");return;}
   if(elegibles.length<2){showToast("Necesitás al menos 2 para 2 premios");return;}
+
+  // Elegir ganadores
   const i1=Math.floor(Math.random()*elegibles.length);
   const w1=elegibles[i1];
   const pool2=elegibles.filter((_,i)=>i!==i1);
   const w2=pool2[Math.floor(Math.random()*pool2.length)];
-  const T=TENANT_CONFIG;
-  document.getElementById("raffleResult").innerHTML=`
-    <span class="raffle-trophy">🏆</span>
-    <div class="raffle-winner-lbl">🥇 1° PREMIO — ${T.premio_1.nombre.toUpperCase()}</div>
-    <div class="raffle-winner-name">${w1.nombre}</div>
-    <div class="raffle-winner-email">${w1.email}</div>
-    <hr style="border-color:rgba(255,255,255,.3);margin:14px 0;">
-    <div class="raffle-winner-lbl">🥈 2° PREMIO — ${T.premio_2.nombre.toUpperCase()}</div>
-    <div class="raffle-winner-name" style="font-size:22px;">${w2.nombre}</div>
-    <div class="raffle-winner-email">${w2.email}</div>`;
-  document.getElementById("raffleResult").style.display="block";
-  document.getElementById("raffleResult").scrollIntoView({behavior:"smooth"});
-  showToast("🎉 ¡Dos ganadores seleccionados!");
+
+  // Mostrar spinning
+  document.getElementById("sorteo-idle").style.display="none";
+  document.getElementById("sorteo-spinning").style.display="block";
+
+  // Efecto ruleta — nombres aleatorios girando
+  const allNames=adminData.map(r=>r.nombre);
+  let ticks=0;
+  const maxTicks=40;
+  const spin1=document.getElementById("spin-name-1");
+  const spin2=document.getElementById("spin-name-2");
+
+  const interval=setInterval(()=>{
+    ticks++;
+    // Velocidad: rápido al principio, lento al final
+    const delay=ticks<20?50:ticks<30?100:ticks<38?200:300;
+    spin1.textContent=allNames[Math.floor(Math.random()*allNames.length)];
+    spin2.textContent=allNames[Math.floor(Math.random()*allNames.length)];
+    spin1.style.opacity=ticks%2===0?"1":"0.6";
+    spin2.style.opacity=ticks%2===0?"0.6":"1";
+
+    if(ticks>=maxTicks){
+      clearInterval(interval);
+      // Mostrar resultado final
+      setTimeout(()=>{
+        document.getElementById("sorteo-spinning").style.display="none";
+        document.getElementById("result-name-1").textContent=w1.nombre;
+        document.getElementById("result-email-1").textContent=w1.email;
+        document.getElementById("result-name-2").textContent=w2.nombre;
+        document.getElementById("result-email-2").textContent=w2.email;
+        document.getElementById("sorteo-result").style.display="block";
+        launchConfetti();
+        showToast("🎉 ¡Dos ganadores seleccionados!");
+      }, 400);
+    }
+  }, 80);
 }
+
+function launchConfetti(){
+  const canvas=document.getElementById("confetti-canvas");
+  if(!canvas)return;
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  const ctx=canvas.getContext("2d");
+  const colors=["#fe6400","#ffd700","#4caf50","#1a99e6","#e53935","#fff","#30424f"];
+  const pieces=[];
+  for(let i=0;i<150;i++){
+    pieces.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height-canvas.height,
+      w:Math.random()*12+4,
+      h:Math.random()*6+3,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      vx:(Math.random()-0.5)*4,
+      vy:Math.random()*4+2,
+      angle:Math.random()*360,
+      va:(Math.random()-0.5)*8,
+      opacity:1
+    });
+  }
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      p.x+=p.vx;
+      p.y+=p.vy;
+      p.angle+=p.va;
+      p.vy+=0.08; // gravedad
+      if(frame>120) p.opacity-=0.015;
+      ctx.save();
+      ctx.globalAlpha=Math.max(0,p.opacity);
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.angle*Math.PI/180);
+      ctx.fillStyle=p.color;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    frame++;
+    if(frame<180) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+
+function doRaffle(){} // mantener por compatibilidad
 
 // ══════════════════════════════════════════════════════
 // UI UTILS
