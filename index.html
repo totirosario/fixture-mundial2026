@@ -374,6 +374,7 @@ body{background:#fff;font-family:'Barlow Condensed',sans-serif;color:var(--text)
         <button class="admin-btn orange" onclick="loadAdminData()">🔄 Actualizar</button>
         <button class="admin-btn green" onclick="exportCSV()">⬇️ Exportar CSV</button>
         <button class="admin-btn dark" onclick="doRaffle()">🎰 SORTEO</button>
+        <button class="admin-btn" style="background:#7a5c3a;color:#fff;" onclick="resetRaffle()">🔄 Resetear sorteo</button>
       </div>
       <div class="raffle-result" id="raffleResult"></div>
       <div class="sec-title">PARTICIPANTES</div>
@@ -766,21 +767,83 @@ function renderPartidosCard(){
 // ══════════════════════════════════════════════════════
 function getGroupTop(gid,pos){return groupPicks[gid]?.[pos]||null;}
 
-const bracket32=[
-  {h:{pos:0,g:"A"},a:{third:0}},{h:{pos:0,g:"B"},a:{third:1}},
-  {h:{pos:0,g:"C"},a:{third:2}},{h:{pos:0,g:"D"},a:{third:3}},
-  {h:{pos:0,g:"E"},a:{third:4}},{h:{pos:0,g:"F"},a:{third:5}},
-  {h:{pos:0,g:"G"},a:{third:6}},{h:{pos:0,g:"H"},a:{third:7}},
-  {h:{pos:1,g:"A"},a:{pos:1,g:"B"}},{h:{pos:1,g:"C"},a:{pos:1,g:"D"}},
-  {h:{pos:1,g:"E"},a:{pos:1,g:"F"}},{h:{pos:1,g:"G"},a:{pos:1,g:"H"}},
-  {h:{pos:0,g:"I"},a:{pos:1,g:"I"}},{h:{pos:0,g:"J"},a:{pos:1,g:"J"}},
-  {h:{pos:0,g:"K"},a:{pos:1,g:"K"}},{h:{pos:0,g:"L"},a:{pos:1,g:"L"}},
+// ── BRACKET R32 SEGÚN REGLAMENTO FIFA 2026 ──────────────
+// Cruces fijos para 1°s vs 2°s y grupos I-L internos.
+// Los 8 mejores terceros se asignan según su grupo de origen
+// siguiendo la lógica del Annex C: cada tercero va al cruce
+// del primer lugar del grupo más cercano que no sea el suyo.
+// Los grupos A-H: sus 1°s enfrentan terceros de otros grupos.
+// Los grupos I-L: 1° vs 2° del mismo grupo.
+
+const BRACKET_FIXED = [
+  // Partidos 0-7: 1°s grupos A-H vs terceros asignados por origen
+  {h:{pos:0,g:"A"}, a:{thirdSlot:"A"}},
+  {h:{pos:0,g:"B"}, a:{thirdSlot:"B"}},
+  {h:{pos:0,g:"C"}, a:{thirdSlot:"C"}},
+  {h:{pos:0,g:"D"}, a:{thirdSlot:"D"}},
+  {h:{pos:0,g:"E"}, a:{thirdSlot:"E"}},
+  {h:{pos:0,g:"F"}, a:{thirdSlot:"F"}},
+  {h:{pos:0,g:"G"}, a:{thirdSlot:"G"}},
+  {h:{pos:0,g:"H"}, a:{thirdSlot:"H"}},
+  // Partidos 8-11: 2°s grupos A-H se cruzan entre sí
+  {h:{pos:1,g:"A"}, a:{pos:1,g:"B"}},
+  {h:{pos:1,g:"C"}, a:{pos:1,g:"D"}},
+  {h:{pos:1,g:"E"}, a:{pos:1,g:"F"}},
+  {h:{pos:1,g:"G"}, a:{pos:1,g:"H"}},
+  // Partidos 12-15: grupos I-L, 1° vs 2° del mismo grupo
+  {h:{pos:0,g:"I"}, a:{pos:1,g:"I"}},
+  {h:{pos:0,g:"J"}, a:{pos:1,g:"J"}},
+  {h:{pos:0,g:"K"}, a:{pos:1,g:"K"}},
+  {h:{pos:0,g:"L"}, a:{pos:1,g:"L"}},
 ];
 
-function resolveR32(slot){
-  if(slot.third!==undefined)return getBestThirds()[slot.third]||null;
-  return getGroupTop(slot.g,slot.pos);
+// Asigna los 8 mejores terceros a los slots A-H evitando que
+// un tercero enfrente al 1° de su propio grupo.
+function assignThirdsToSlots(){
+  const thirds = selectedThirds.slice(0,8);
+  // Mapa slot → equipo. Slot = grupo del 1° que enfrenta.
+  const assignment = {A:null,B:null,C:null,D:null,E:null,F:null,G:null,H:null};
+  const slots = ["A","B","C","D","E","F","G","H"];
+  const used = new Set();
+
+  // Intentar asignar cada tercero al slot de su propio grupo si está disponible,
+  // pero ese slot corresponde al 1° de ese grupo — evitar rematch.
+  // Regla: el 3° del grupo X NO puede ir al slot X (enfrentaría al 1° de X).
+  // Asignación greedy: para cada slot buscar el primer tercero disponible
+  // que no sea del mismo grupo.
+
+  // Construir mapa de qué grupo viene cada tercero
+  const thirdGroup = {};
+  thirds.forEach(team => {
+    GROUPS.forEach(g => {
+      if(groupPicks[g.id]?.[2] === team) thirdGroup[team] = g.id;
+    });
+  });
+
+  // Asignación: para cada slot, asignar tercero que no sea del mismo grupo
+  for(const slot of slots){
+    for(const team of thirds){
+      if(!used.has(team) && thirdGroup[team] !== slot){
+        assignment[slot] = team;
+        used.add(team);
+        break;
+      }
+    }
+  }
+
+  // Si quedaron slots sin asignar (menos de 8 terceros), dejar null
+  return assignment;
 }
+
+function resolveR32(slot){
+  if(slot.thirdSlot !== undefined){
+    const assignment = assignThirdsToSlots();
+    return assignment[slot.thirdSlot] || null;
+  }
+  return getGroupTop(slot.g, slot.pos);
+}
+
+const bracket32 = BRACKET_FIXED;
 
 function getMatchParticipants(src,matchIdx){
   const srcMap={r16:"r32",qf:"r16",sf:"qf"};
@@ -1038,6 +1101,14 @@ function exportCSV(){
   a.href=URL.createObjectURL(new Blob([rows],{type:"text/csv;charset=utf-8;"}));
   a.download=`participantes_${TENANT_CONFIG.slug}_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();showToast("CSV descargado ✓");
+}
+
+function resetRaffle(){
+  if(!confirm("¿Resetear el resultado del sorteo?"))return;
+  const res=document.getElementById("raffleResult");
+  res.style.display="none";
+  res.innerHTML="";
+  showToast("Sorteo reseteado ✓");
 }
 
 function doRaffle(){
